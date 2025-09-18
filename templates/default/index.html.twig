@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DefaultController!
+{% endblock %}
+
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+	</style>
+
+	<div class="example-wrapper">
+		<h1>Hello
+			{{ controller_name }}! ✅</h1>
+
+		{{ dump(number, list) }}
+		<p>Round Nummer:
+			{{ round(22.7) }}
+		</p>
+
+		<p>Siegfried function:
+			{{ siegfried() }}
+		</p>
+		<p></p>
+		<p>Siegfried filter:
+			{{ 45.6|siegfried }}
+		</p>
+		<p></p>
+		<p>
+			<h3>{{ siegfried() }}
+				dein glückliche Nummer ist:
+				{{number}}<h3>
+
+					<h2>
+						{% if number > 50 %}
+							Nummer ist großer als 50
+						{% else %}
+							Nummer ist weniger als 50
+						{% endif %}
+						<h2>
+
+							<ul>
+								{% for item in list %}
+									<li>{{ item }}</li>
+								{% endfor %}
+								<ul>
+
+									<p>This friendly message is coming from:</p>
+									<p>
+										<ul>
+											<li>Your controller at
+												<code>/var/www/html/symfony/src/Controller/DefaultController.php</code>
+											</li>
+											<li>Your template at
+												<code>/var/www/html/symfony/templates/default/index.html.twig</code>
+											</li>
+										</ul>
+									</p>
+								</div>
+								Render Controller:
+								<div style="background: #ccc">
+									{{render(controller('App\\Controller\\DefaultController::test1'))}}
+								</div>
+							{% endblock %}
