@@ -1,0 +1,38 @@
+{
+  "editor.formatOnSave": true,
+  "[php]": {
+    "editor.defaultFormatter": "junstyle.php-cs-fixer",
+    "editor.formatOnSave": true
+  },
+  // ЛОКАЛЬНЫЙ бинарник из composer (у вас он есть)
+  "php-cs-fixer.executablePath": "${workspaceFolder}/vendor/bin/php-cs-fixer",
+  "php-cs-fixer.rules": "@Symfony",
+  "php-cs-fixer.allowRisky": true,
+  "php.validate.enable": false,
+  "intelephense.environment.phpVersion": "8.3",
+  // На всякий случай включим auto-fix действий при сохранении
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  // Опционально: чтобы VS Code точно видел рабочую папку как доверенную
+  "security.workspace.trust.enabled": true,
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "127.0.0.1",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "Symfony",
+      "group": "Local",
+      "database": "symfony",
+      "username": "admin",
+      "connectionTimeout": 30,
+      "password": "pw"
+    }
+  ]
+}
