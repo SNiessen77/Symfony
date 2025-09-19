@@ -1,0 +1,9 @@
+{
+  "plugins": ["prettier-plugin-twig-melody"],
+  "overrides": [{ "files": "*.twig", "options": { "parser": "melody" } }],
+  "printWidth": 160,
+  "tabWidth": 4,
+  "singleAttributePerLine": false,
+  "htmlWhitespaceSensitivity": "ignore"
+}
+
