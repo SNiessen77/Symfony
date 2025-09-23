@@ -2,10 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\Post;
+use App\Form\FeedbackForm;
+use App\Repository\PostRepository;
+use App\Service\ExportCsv;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DefaultController extends AbstractController
@@ -27,9 +34,49 @@ class DefaultController extends AbstractController
     }
 
     #[Route('/contact', name: 'contact')]
-    public function contact(): Response
+    public function contact(Request $request, EntityManagerInterface $em): Response
     {
-        return $this->render('default/contact.html.twig');
+        $form = $this->createForm(FeedbackForm::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $feedback = $form->getData();
+
+            $em->persist($feedback);
+            $em->flush();
+
+            return $this->render('default/thanks.html.twig');
+        }
+
+        return $this->render('default/contact.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    public function categoriesWidget(EntityManagerInterface $em): Response
+    {
+        $list = $em->getRepository(Category::class)->getPopularList();
+
+        return $this->render('default/widget/categories.html.twig', [
+            'list' => $list,
+        ]);
+    }
+
+    public function popularPostWidget(): Response
+    {
+        return $this->render('default/widget/popularPost.html.twig');
+    }
+
+    #[Route('/export', name: 'export')]
+    public function ExportAction(ExportCsv $exportCsv, PostRepository $postRepository)
+    {
+        $list = $postRepository->getAllItems();
+        $file = $exportCsv->export($list);
+
+        $ressponse = new BinaryFileResponse($file);
+        $ressponse->headers->set('Content-type', 'text/csv');
+        $ressponse->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'export-data.csv');
+
+        return $ressponse;
     }
 
     /* #[Route('/test', name: 'test')]
