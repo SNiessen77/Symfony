@@ -16,6 +16,22 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
+    public function getPopularList(): array
+    {
+        $sql = <<<SQL
+        SELECT c.id, c.name, COUNT(p.id) AS posts
+        FROM category c
+        LEFT JOIN post p ON p.category_id = c.id
+        GROUP BY c.id, c.name
+        HAVING COUNT(p.id) > 0
+        ORDER BY posts DESC
+    SQL;
+
+        $conn = $this->getEntityManager()->getConnection();
+
+        return $conn->prepare($sql)->executeQuery()->fetchAllAssociative();
+    }
+
     //    /**
     //     * @return Category[] Returns an array of Category objects
     //     */
