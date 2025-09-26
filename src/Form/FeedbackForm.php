@@ -19,7 +19,7 @@ class FeedbackForm extends AbstractType
             ->add('message', TextareaType::class);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             // Configure your form options here

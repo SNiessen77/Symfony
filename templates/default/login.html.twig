@@ -11,10 +11,10 @@
                             <!-- Post -->
                             <article class="post">
                                 <h5 class="text-center mt-0 mb-5 pb-3 text-uppercase">
-                                    <b>Get In Touch</b>
+                                    <b>Login</b>
                                 </h5>
 
-                                {% for message in app.flashes('success') %}
+                                {# {% for message in app.flashes('success') %}
                                     <div class="alert alert-success text-center"
                                         role="alert">
                                         {{ message }}
@@ -25,8 +25,8 @@
                                     Duis mollis eget augue et lobortis. Nam nunc
                                     justo, aliquet sed condimentum vel, faucibus
                                     in dolor. Proin eleifend hendrerit rhoncus.
-                                </p>
-                                {{ form_start(form) }}
+                                </p> #}
+                                {# {{ form_start(form) }}
                                 {{ form_row(form.name) }}
                                 {{ form_row(form.email) }}
                                 {{ form_row(form.subject) }}
@@ -34,53 +34,27 @@
                                 <button type="submit" class="btn btn-dark">
                                     Send
                                 </button>
-                                {{ form_end(form) }}
+                                {{ form_end(form) }} #}
 
-                                {# <form action="#" method="post" class="mt-4">
+                                <form action="{{ path('login') }}"
+                                    method="post"
+                                    class="mt-4">
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <input id="author"
-                                                    class="form-control"
-                                                    placeholder="Name*"
-                                                    name="author"
+                                                <input class="form-control"
+                                                    name="_username"
                                                     type="text"
-                                                    required="" />
+                                                    value="{{ last_username }}"
+                                                    autocomplete="off" />
                                             </div>
                                         </div>
 
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <input id="email"
-                                                    class="form-control"
-                                                    placeholder="Email*"
-                                                    name="email"
-                                                    type="text"
-                                                    required="" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <input id="subject"
-                                                    class="form-control"
-                                                    placeholder="Subject"
-                                                    name="subject"
-                                                    type="text" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <textarea id="comment"
-                                                    class="form-control"
-                                                    rows="5"
-                                                    placeholder="Your Message*"
-                                                    name="comment"
-                                                    required=""></textarea>
+                                                <input class="form-control"
+                                                    name="_password"
+                                                    type="password" />
                                             </div>
                                         </div>
                                     </div>
@@ -92,12 +66,12 @@
                                                     type="submit"
                                                     id="submit"
                                                     class="btn btn-dark">
-                                                    Send
+                                                    LOGIN
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                </form> #}
+                                </form>
                             </article>
                             <!-- Post end -->
                         </div>
