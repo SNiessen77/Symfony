@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class ExportCsv implements ExportInterface
+class ExportJson implements ExportInterface
 {
     protected KernelInterface $kernel;
 
@@ -15,14 +15,11 @@ class ExportCsv implements ExportInterface
 
     public function export(array $data): string
     {
-        $lines = [];
-        foreach ($data as $row) {
-            $lines[] = implode(',', $row);
-        }
-        $string = implode("\n", $lines);
+        $string = json_encode($data);
+
         $filename = tempnam(
             $this->kernel->getProjectDir().'/var',
-            'export-csv-');
+            'export-json-');
         file_put_contents($filename, $string);
 
         return $filename;
@@ -30,11 +27,11 @@ class ExportCsv implements ExportInterface
 
     public function getFileType(): string
     {
-        return 'text/csv';
+        return 'application/json';
     }
 
     public function getFileName(): string
     {
-        return 'export-data.csv';
+        return 'export-data.json';
     }
 }
