@@ -6,21 +6,27 @@ use App\Entity\Category;
 use App\Entity\Post;
 use App\Form\FeedbackForm;
 use App\Repository\PostRepository;
-use App\Service\ExportCsv;
+use App\Service\ExportInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class DefaultController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
-    public function homepage(EntityManagerInterface $em): Response
+    public function homepage(SessionInterface $session, EntityManagerInterface $em): Response
     {
         $posts = $em->getRepository(Post::class)->findAll();
+
+        $session->set('name', 'Symfony');
 
         return $this->render('default/homepage.html.twig', [
             'posts' => $posts,
@@ -28,14 +34,19 @@ class DefaultController extends AbstractController
     }
 
     #[Route('/about', name: 'about')]
-    public function about(): Response
+    public function about(SessionInterface $session): Response
     {
-        return $this->render('default/about.html.twig');
+        $name = $session->get('name', 'Guest');
+
+        return $this->render('default/about.html.twig', [
+            'name' => $name,
+        ]);
     }
 
     #[Route('/contact', name: 'contact')]
-    public function contact(Request $request, EntityManagerInterface $em): Response
+    public function contact(SessionInterface $session, Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
+        $session->remove('name');
         $form = $this->createForm(FeedbackForm::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -44,7 +55,18 @@ class DefaultController extends AbstractController
             $em->persist($feedback);
             $em->flush();
 
-            return $this->render('default/thanks.html.twig');
+            $message = new Email();
+            $message->from('user@example.com');
+            $message->to('admin@example.com');
+            $message->text('You have a new feedback message from '.$feedback->getName().', email: '.$feedback->getEmail().'. Message: '.$feedback->getMessage());
+            $message->html('<strong>New feedback message</strong>');
+            $message->subject('New feedback message from '.$feedback->getName());
+
+            $mailer->send($message);
+
+            $this->addFlash('success', 'Your message has been successfully sent. Thanks for your feedback!');
+
+            return $this->redirectToRoute('contact');
         }
 
         return $this->render('default/contact.html.twig', [
@@ -67,16 +89,33 @@ class DefaultController extends AbstractController
     }
 
     #[Route('/export', name: 'export')]
-    public function ExportAction(ExportCsv $exportCsv, PostRepository $postRepository)
+    public function ExportAction(ExportInterface $exporter, PostRepository $postRepository)
     {
         $list = $postRepository->getAllItems();
-        $file = $exportCsv->export($list);
+        $file = $exporter->export($list);
 
         $ressponse = new BinaryFileResponse($file);
-        $ressponse->headers->set('Content-type', 'text/csv');
-        $ressponse->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'export-data.csv');
+        $ressponse->headers->set('Content-type', $exporter->getFileType());
+        $ressponse->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $exporter->getFileName());
 
         return $ressponse;
+    }
+
+    #[Route('/login', name: 'login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        return $this->render('default/login.html.twig', [
+            'last_username' => '',   // принудительно пусто
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+        ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        // Этот метод не выполняется: запрос перехватывает firewall.
+        // Можно оставить пустым или бросить исключение:
+        throw new \LogicException('Logout is handled by the firewall.');
     }
 
     /* #[Route('/test', name: 'test')]

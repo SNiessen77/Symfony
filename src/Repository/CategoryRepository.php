@@ -23,7 +23,7 @@ class CategoryRepository extends ServiceEntityRepository
         FROM category c
         LEFT JOIN post p ON p.category_id = c.id
         GROUP BY c.id, c.name
-        HAVING COUNT(p.id) > 0
+        -- HAVING COUNT(p.id) > 0
         ORDER BY posts DESC
     SQL;
 
