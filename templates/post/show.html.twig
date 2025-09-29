@@ -501,17 +501,13 @@
                         </aside>
 
                         <!-- Categories widget -->
-                        <aside class="widget widget_categories">
-                            <div class="widget-title">
-                                Categories
-                            </div>
-                            <ul>
-                                <li><a href="#">Journey</a> (40)</li>
-                                <li><a href="#">Photography</a> (08)</li>
-                                <li><a href="#">Lifestyle</a> (11)</li>
-                                <li><a href="#">Food &amp; Drinks</a> (21)</li>
-                            </ul>
-                        </aside>
+                        {{
+                            render(
+                                controller(
+                                    'App\\Controller\\DefaultController::categoriesWidget'
+                                )
+                            )
+                        }}
 
                         <!-- Recent entries widget -->
                         <aside class="widget widget_recent_entries_custom">
