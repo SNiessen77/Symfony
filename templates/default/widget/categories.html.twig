@@ -1,6 +1,13 @@
 <aside class="widget widget_categories">
     <div class="widget-title">
-        Categories
+        {{
+            '{0}No category|{1}One category|]1,Inf[Categories (%count%)'|trans(
+                {
+                    '%count%': list|length
+                },
+                'homepage'
+            )
+        }}
     </div>
     <ul>
         {% for item in list %}

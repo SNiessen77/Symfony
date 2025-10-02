@@ -10,7 +10,14 @@
                                 {% if app.user is not empty %}
                                     <h2>
                                         <span>
-                                            Welcome, {{ app.user.firstName }}!
+                                            {{
+                                                'Welcome, %name%!'|trans(
+                                                    {
+                                                        '%name%': app.user.firstName
+                                                    },
+                                                    'homepage'
+                                                )
+                                            }}
                                         </span>
                                     </h2>
                                     <h2>

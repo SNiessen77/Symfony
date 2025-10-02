@@ -869,3 +869,7 @@ textarea.form-control {
         padding: 20px 20px;
     }
 }
+
+******************************************************
+.form-group label,
+.mb-3 > label { display:block; margin-bottom:.5rem; }

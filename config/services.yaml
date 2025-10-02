@@ -28,3 +28,7 @@ services:
         # You can switch the implementation to ExportJson by changing the class here
         # class: App\Service\ExportJson
         class: App\Service\ExportSerialize
+
+    App\EventListener\AppListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
