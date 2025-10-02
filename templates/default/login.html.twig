@@ -10,9 +10,9 @@
                         <div class="col-8">
                             <!-- Post -->
                             <article class="post">
-                                <h5 class="text-center mt-0 mb-5 pb-3 text-uppercase">
+                                <h4 class="text-center mt-0 mb-5 pb-3 text-uppercase">
                                     <b>Login</b>
-                                </h5>
+                                </h4>
 
                                 {# {% for message in app.flashes('success') %}
                                     <div class="alert alert-success text-center"
@@ -71,6 +71,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div>
+                                        <h6>
+                                            Don't have an account? <a href="{{ path('app_register') }}">Register</a>
+                                        </h6>
+                                    </div>
+                                    {% if error %}
+                                        <div class="alert alert-danger">
+                                            {{
+                                                error.messageKey|trans(
+                                                    error.messageData,
+                                                    'security'
+                                                )
+                                            }}
+                                        </div>
+                                    {% endif %}
                                 </form>
                             </article>
                             <!-- Post end -->
