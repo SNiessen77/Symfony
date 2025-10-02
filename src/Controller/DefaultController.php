@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\FeedbackForm;
+use App\Form\RegistrationType;
 use App\Repository\PostRepository;
 use App\Service\ExportInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,8 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -55,14 +59,24 @@ class DefaultController extends AbstractController
             $em->persist($feedback);
             $em->flush();
 
-            $message = new Email();
-            $message->from('user@example.com');
-            $message->to('admin@example.com');
-            $message->text('You have a new feedback message from '.$feedback->getName().', email: '.$feedback->getEmail().'. Message: '.$feedback->getMessage());
-            $message->html('<strong>New feedback message</strong>');
-            $message->subject('New feedback message from '.$feedback->getName());
+            $message = (new Email())
+            ->from('nissensy@gmail.com')            // отправитель = ваш Gmail
+            ->to('nissensy@gmail.com')           // получатель
+            ->subject('Feedback form: ['.$feedback->getSubject().']')
+            ->replyTo($feedback->getEmail() ?: 'nissensy@gmail.com')
+            ->text('Plain text body')
+            ->html($this->renderView('mail/feedback.html.twig', [
+                'name' => $feedback->getName(),
+                'message' => $feedback->getMessage(),
+                'contact' => $feedback->getEmail(),
+            ]));
 
-            $mailer->send($message);
+            try {
+                $mailer->send($message);
+                // ok
+            } catch (TransportExceptionInterface $e) {
+                throw $e;
+            }
 
             $this->addFlash('success', 'Your message has been successfully sent. Thanks for your feedback!');
 
@@ -116,6 +130,35 @@ class DefaultController extends AbstractController
         // Этот метод не выполняется: запрос перехватывает firewall.
         // Можно оставить пустым или бросить исключение:
         throw new \LogicException('Logout is handled by the firewall.');
+    }
+
+    #[Route('/register', name: 'app_register')]
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $em): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            // encode the plain password
+            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+
+            $user->setLoginCnt(0);
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', 'Registration successful! You can now log in.');
+
+            // do anything else you need here, like send an email
+
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/register.html.twig', [
+            'form' => $form,
+        ]);
     }
 
     /* #[Route('/test', name: 'test')]
