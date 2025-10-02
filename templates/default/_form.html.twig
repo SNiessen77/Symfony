@@ -1,0 +1,28 @@
+{{ form_start(form) }}
+
+{{ form_row(form.firstName) }}
+{{ form_row(form.lastName) }}
+{{ form_row(form.email) }}
+
+{# селект: label сверху и нормальный отступ #}
+{{ form_row(form.sex, {
+  label: 'Geschlecht',
+  label_attr: { class: 'form-label d-block' },   # принудительно сделать label блочным
+  row_attr: { class: 'mb-3' }                    # отступ как у остальных
+}) }}
+
+{{ form_row(form.birthday) }}
+{{ form_row(form.login) }}
+{{ form_row(form.plainPassword.first) }}
+{{ form_row(form.plainPassword.second) }}
+
+{{ form_rest(form) }}
+
+<div class="form-group row">
+  <div class="col-sm-4 col-sm-offset-2">
+    <a class="btn btn-white btn-sm" href="{{ path('login') }}">back to login</a>
+    <button class="btn btn-primary btn-sm" type="submit">{{ button_label|default('Register') }}</button>
+  </div>
+</div>
+
+{{ form_end(form) }}

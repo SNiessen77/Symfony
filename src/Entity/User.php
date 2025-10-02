@@ -39,6 +39,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true, 'default' => 0])]
+    private ?int $loginCnt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $loginAt = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $email = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -128,6 +142,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getLoginCnt(): ?int
+    {
+        return $this->loginCnt;
+    }
+
+    public function setLoginCnt(int $loginCnt): static
+    {
+        $this->loginCnt = $loginCnt;
+
+        return $this;
+    }
+
+    public function getLoginAt(): ?\DateTimeImmutable
+    {
+        return $this->loginAt;
+    }
+
+    public function setLoginAt(?\DateTimeImmutable $loginAt): static
+    {
+        $this->loginAt = $loginAt;
+
+        return $this;
+    }
+
     /**
      * Returns the roles granted to the user.
      */
@@ -153,5 +191,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // Assuming 'login' is the unique identifier
         return (string) $this->login;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
     }
 }
