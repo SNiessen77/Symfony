@@ -1,0 +1,5 @@
+.my-pagination-wrapper .page-item.active .page-link {
+  background-color: rgb(44, 57, 69); /* ваш цвет */
+  border-color: #6f42c1;
+  color: #fff;
+}

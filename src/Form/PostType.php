@@ -19,12 +19,18 @@ class PostType extends AbstractType
             ->add('content', TextareaType::class, [
                 'attr' => ['rows' => 10],
             ])
-            ->add('publischedAt', null, [
+            /* ->add('publischedAt', null, [
                 'widget' => 'single_text',
-            ])
+            ]) */
+
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
+                'label' => 'Category',
+                'placeholder' => 'Wählen Sie eine Kategorie aus', // первый пункт
+                'required' => false,              // разрешить оставить пустым
+                'label_attr' => ['style' => 'margin-right:8px'], // пробел между label и select
+                'attr' => ['style' => 'display:inline-block'],   // чтобы стояли в одну линию (если нужно)
             ])
         ;
     }

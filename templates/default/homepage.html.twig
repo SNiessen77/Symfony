@@ -69,12 +69,12 @@
                                 <ul class="post-meta">
                                     <li>
                                         <i class="mdi mdi-calendar"></i>
-                                        {{ post.publischedAt|format_date }}
+                                        {{ post.publisched_at|format_date }}
                                     </li>
                                     <li>
                                         <i class="mdi mdi-tag-text-outline"></i>
                                         {{ post.category
-                                            ? post.category.name
+                                            ? post.category
                                             : 'Without category' }}
                                     </li>
                                     <li>
@@ -130,6 +130,9 @@
                         </article>
                         <!-- Post end -->
                     {% endfor %}
+                    <div class="my-pagination-wrapper">
+                        {{ knp_pagination_render(posts) }}
+                    </div>
                 </div>
                 <!-- Content end -->
 

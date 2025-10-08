@@ -10,6 +10,7 @@ use App\Form\RegistrationType;
 use App\Repository\PostRepository;
 use App\Service\ExportInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,9 +27,10 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class DefaultController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
-    public function homepage(SessionInterface $session, EntityManagerInterface $em): Response
+    public function homepage(Request $request, SessionInterface $session, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
-        $posts = $em->getRepository(Post::class)->findAll();
+        $list = $em->getRepository(Post::class)->getPostListQuery();
+        $posts = $paginator->paginate($list, max(0, $request->get('page', 1)), 3);
 
         $session->set('name', 'Symfony');
 

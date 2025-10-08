@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
@@ -15,6 +16,9 @@ class Category
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
+
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true, 'default' => 0])]
+    private int $postCnt = 0;
 
     public function __toString(): string
     {
@@ -34,6 +38,18 @@ class Category
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getPostCnt(): int
+    {
+        return $this->postCnt;
+    }
+
+    public function setPostCnt(int $postCnt): static
+    {
+        $this->postCnt = $postCnt;
 
         return $this;
     }
