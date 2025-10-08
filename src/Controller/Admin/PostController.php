@@ -3,10 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
+use App\EventListener\PostChangesEvent;
 use App\Form\PostType;
-use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,15 +17,26 @@ use Symfony\Component\Routing\Attribute\Route;
 class PostController extends AbstractController
 {
     #[Route('/', name: 'app_admin_post_index', methods: ['GET'])]
-    public function index(PostRepository $postRepository): Response
+    public function index(Request $request, PaginatorInterface $paginator, EntityManagerInterface $em): Response
     {
+        $page = max($request->query->getInt('page', 1), 1);
+        $limit = 3;
+
+        $dql = 'SELECT a FROM App\Entity\Post a ORDER BY a.id DESC';
+        $query = $em->createQuery($dql);
+        $posts = $paginator->paginate(
+            $query,
+            $page,
+            $limit,
+        );
+
         return $this->render('admin/post/index.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'posts' => $posts,
         ]);
     }
 
     #[Route('/new', name: 'app_admin_post_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EventDispatcherInterface $ed): Response
     {
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
@@ -32,6 +45,9 @@ class PostController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($post);
             $entityManager->flush();
+
+            $category = $post->getCategory();
+            $ed->dispatch(new PostChangesEvent($category));
 
             return $this->redirectToRoute('app_admin_post_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -69,12 +85,38 @@ class PostController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_admin_post_delete', methods: ['POST'])]
-    public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($post);
-            $entityManager->flush();
+    public function delete(
+        Request $request,
+        Post $post,
+        EntityManagerInterface $em,
+        EventDispatcherInterface $ed,
+    ): Response {
+        $category = $post->getCategory();
+
+        $token = $request->request->get('_token'); // а не getPayload()
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $token)) {
+            $em->remove($post);
+            $em->flush();
+
+            $ed->dispatch(new PostChangesEvent($category));
         }
+
+        return $this->redirectToRoute('app_admin_post_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/delete-selected', name: 'app_admin_post_delete_selected', methods: ['POST'], priority: 99)]
+    public function deleteSelected(
+        Request $request,
+        EntityManagerInterface $em,
+    ): Response {
+        foreach ($request->request->all('id') as $id) {
+            $post = $em->find(Post::class, $id);
+            if (false === empty($post)) {
+                $em->remove($post);
+            }
+        }
+        $this->addFlash('success', 'Selected items deleted successfully.');
+        $em->flush();
 
         return $this->redirectToRoute('app_admin_post_index', [], Response::HTTP_SEE_OTHER);
     }

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Post
 {
     #[ORM\Id]
@@ -25,6 +26,14 @@ class Post
 
     #[ORM\ManyToOne]
     private ?Category $category = null;
+
+    #[ORM\PrePersist]
+    public function setPublischedAtValue(): void
+    {
+        if (null === $this->publischedAt) {
+            $this->publischedAt = new \DateTimeImmutable();
+        }
+    }
 
     public function getId(): ?int
     {
@@ -58,13 +67,6 @@ class Post
     public function getPublischedAt(): ?\DateTimeImmutable
     {
         return $this->publischedAt;
-    }
-
-    public function setPublischedAt(?\DateTimeImmutable $publischedAt): static
-    {
-        $this->publischedAt = $publischedAt;
-
-        return $this;
     }
 
     public function getCategory(): ?Category

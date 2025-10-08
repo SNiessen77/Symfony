@@ -13,14 +13,31 @@
                 </h1>
             </div>
             <div class="ibox-content">
-                {{
-                    include(
-                        'admin/category/_form.html.twig',
-                        {
-                            button_label: 'Update'
-                        }
-                    )
-                }}
+                {# ФОРМА РЕДАКТИРОВАНИЯ #}
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div class="form-group row mt-3">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-secondary btn-sm"
+                            href="{{ path('app_admin_category_index') }}">
+                            back to list
+                        </a>
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            {{ button_label|default('Update') }}
+                        </button>
+                        {% if category is defined and category.id %}
+                            {{
+                                include(
+                                    'admin/category/_delete_form.html.twig',
+                                    {
+                                        category: category
+                                    }
+                                )
+                            }}
+                        {% endif %}
+                    </div>
+                </div>
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
