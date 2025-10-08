@@ -1,3 +1,4 @@
+{# templates/admin/post/new.html.twig #}
 {% extends 'admin.html.twig' %}
 
 {% block title %}
@@ -5,11 +6,23 @@
 {% endblock %}
 
 {% block body %}
-    <h1>
-        Create new Post
-    </h1>
-
-    {{ include('admin/post/_form.html.twig') }}
-
-    <a href="{{ path('app_admin_post_index') }}">back to list</a>
+    <div class="col-lg-6">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h1>
+                    Create new Post
+                </h1>
+            </div>
+            <div class="ibox-content">
+                {{
+                    include(
+                        'admin/post/_form.html.twig',
+                        {
+                            button_label: 'Save'
+                        }
+                    )
+                }}
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -30,6 +30,17 @@ class PostRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getPostListQuery(): string
+    {
+        $sql = 'SELECT SQL_CALC_FOUND_ROWS
+        post.*, 
+        category.name AS category
+        FROM post
+        INNER JOIN category ON post.category_id = category.id';
+
+        return $sql;
+    }
+
     //    /**
     //     * @return Post[] Returns an array of Post objects
     //     */
