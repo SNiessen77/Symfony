@@ -19,12 +19,8 @@ class CategoryRepository extends ServiceEntityRepository
     public function getPopularList(): array
     {
         $sql = <<<SQL
-        SELECT c.id, c.name, COUNT(p.id) AS posts
+        SELECT c.id, c.name, c.post_cnt AS posts
         FROM category c
-        LEFT JOIN post p ON p.category_id = c.id
-        GROUP BY c.id, c.name
-        -- HAVING COUNT(p.id) > 0
-        ORDER BY c.name ASC
     SQL;
 
         $conn = $this->getEntityManager()->getConnection();
